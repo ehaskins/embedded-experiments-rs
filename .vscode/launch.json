@@ -1,0 +1,37 @@
+{
+    /* 
+     * Requires the Rust Language Server (RLS) and Cortex-Debug extensions
+     * https://marketplace.visualstudio.com/items?itemName=rust-lang.rust
+     * https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug
+     */
+    "version": "0.2.0",
+    "configurations": [
+        {
+            /* Launches debug session for currently open example */
+            "type": "cortex-debug",
+            "request": "launch",
+            "name": "Debug Example",
+            "servertype": "openocd",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "cargo build --examples",
+            "runToMain": true,
+            "executable": "./target/thumbv7em-none-eabihf/debug/examples/${fileBasenameNoExtension}",
+            "preLaunchCommands": ["break rust_begin_unwind"],
+            "device": "STM32F303VCT6",
+            "configFiles": [
+                "interface/stlink-v2-1.cfg",
+                "target/stm32f3x.cfg"
+            ],
+            "svdFile": "${env:HOME}/.svd/STM32F303.svd",
+            "swoConfig": {
+                "enabled": true,
+                "cpuFrequency": 8000000,
+                "swoFrequency": 2000000,
+                "source": "probe",
+                "decoders": [
+                    { "type": "console", "label": "ITM", "port": 0 }
+                ]
+            }
+        }
+    ]
+}
