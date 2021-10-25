@@ -1,0 +1,35 @@
+[package]
+edition = "2018"
+name = "bootloader"
+description = "Bootloader for the STM32F3DISCOVERY board"
+version = "1.0.0"
+
+[package.metadata.docs.rs]
+default-target = "thumbv7em-none-eabihf"
+targets = [] # build only default target for docs
+
+[dependencies]
+cortex-m = "0.7.2"
+cortex-m-rt = "0.6.14"
+switch-hal = "0.4.0"
+lsm303dlhc = "0.2.0"
+accelerometer = "0.12.0"
+stm32f3-discovery = { path = "../stm32f3-discovery", features = [ "bootloader" ] }
+panic-halt = "0.2.0"
+panic-itm = "0.4.2"
+
+# For the stm32f303vc mcu
+[dependencies.stm32f3xx-hal]
+features = ["stm32f303xc", "rt"]
+version = "0.7.0"
+
+# # this lets you use `cargo fix`!
+[[bin]]
+name = "bootloader"
+test = false
+bench = false
+
+[profile.release]
+codegen-units = 1 # better optimizations
+debug = true # symbols are nice and they don't increase the size on Flash
+lto = true # better optimizations

@@ -1,0 +1,32 @@
+[package]
+edition = "2018"
+version = "1.0.0"
+name = "stm32f3-discovery"
+description = "Board support package for the STM32F3DISCOVERY board"
+
+[package.metadata.docs.rs]
+default-target = "thumbv7em-none-eabihf"
+targets = [] # build only default target for docs
+
+[dependencies]
+cortex-m = "0.7.2"
+cortex-m-rt = "0.6.14"
+switch-hal = "0.4.0"
+lsm303dlhc = "0.2.0"
+accelerometer = "0.12.0"
+
+# For the stm32f303vc mcu
+[dependencies.stm32f3xx-hal]
+features = ["stm32f303xc", "rt"]
+version = "0.7.0"
+
+[features]
+application = []
+bootloader = []
+no-bootloader = []
+
+# # this lets you use `cargo fix`!
+# [[lib]]
+# name = "stm32f3-discovery"
+# test = false
+# bench = false
