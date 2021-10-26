@@ -15,7 +15,7 @@ cortex-m-rt = "0.6.14"
 switch-hal = "0.4.0"
 lsm303dlhc = "0.2.0"
 accelerometer = "0.12.0"
-stm32f3-discovery = { path = "../stm32f3-discovery", features = [ "no-bootloader" ] }
+stm32f3-discovery = { path = "../stm32f3-discovery" }
 panic-halt = "0.2.0"
 panic-itm = "0.4.2"
 
@@ -23,6 +23,10 @@ panic-itm = "0.4.2"
 [dependencies.stm32f3xx-hal]
 features = ["stm32f303xc", "rt"]
 version = "0.7.0"
+
+[features]
+application = [ "stm32f3-discovery/application" ]
+no-bootloader = [ "stm32f3-discovery/no-bootloader" ]
 
 # # this lets you use `cargo fix`!
 [[bin]]
