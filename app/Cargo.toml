@@ -25,7 +25,6 @@ features = ["stm32f303xc", "rt"]
 version = "0.7.0"
 
 [features]
-application = [ "stm32f3-discovery/application" ]
 no-bootloader = [ "stm32f3-discovery/no-bootloader" ]
 
 # # this lets you use `cargo fix`!

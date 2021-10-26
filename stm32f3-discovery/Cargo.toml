@@ -21,6 +21,7 @@ features = ["stm32f303xc", "rt"]
 version = "0.7.0"
 
 [features]
+default = ["application"]
 application = []
 bootloader = []
 no-bootloader = []
