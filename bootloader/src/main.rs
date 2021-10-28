@@ -12,18 +12,27 @@ use stm32f3_discovery::stm32f3xx_hal::pac;
 use stm32f3_discovery::leds::Leds;
 use stm32f3_discovery::switch_hal::{OutputSwitch, ToggleableOutputSwitch};
 
+#[inline]
+pub fn user_vector_table() -> *mut u32 {
+    extern "C" {
+        static mut __suser: u32;
+    }
+
+    unsafe { &mut __suser }
+}
+
 #[entry]
 fn main() -> ! {
-    let device_periphs = pac::Peripherals::take().unwrap();
-    let mut reset_and_clock_control = device_periphs.RCC.constrain();
+    let device_peripherals = pac::Peripherals::take().unwrap();
+    let mut reset_and_clock_control = device_peripherals.RCC.constrain();
 
-    let core_periphs = cortex_m::Peripherals::take().unwrap();
-    let mut flash = device_periphs.FLASH.constrain();
+    let core_peripherals = cortex_m::Peripherals::take().unwrap();
+    let mut flash = device_peripherals.FLASH.constrain();
     let clocks = reset_and_clock_control.cfgr.freeze(&mut flash.acr);
-    let mut delay = Delay::new(core_periphs.SYST, clocks);
+    let mut delay = Delay::new(core_peripherals.SYST, clocks);
 
     // initialize user leds
-    let mut gpioe = device_periphs.GPIOE.split(&mut reset_and_clock_control.ahb);
+    let mut gpioe = device_peripherals.GPIOE.split(&mut reset_and_clock_control.ahb);
     let mut leds = Leds::new(
         gpioe.pe8,
         gpioe.pe9,
@@ -37,16 +46,21 @@ fn main() -> ! {
         &mut gpioe.otyper,
     );
 
-    loop {
-        leds.ld3.toggle().ok();
-        delay.delay_ms(1000u16);
-        leds.ld3.toggle().ok();
-        delay.delay_ms(1000u16);
+    let mut sequence = [
+        &mut leds.ld3,
+        &mut leds.ld5,
+        &mut leds.ld7,
+        &mut leds.ld9,
+        &mut leds.ld10,
+        &mut leds.ld8,
+        &mut leds.ld6,
+        &mut leds.ld4,
+    ];
 
-        //explicit on/off
-        leds.ld4.on().ok();
-        delay.delay_ms(1000u16);
-        leds.ld4.off().ok();
-        delay.delay_ms(1000u16);
+    loop {
+        for led in &mut sequence {
+            led.toggle().unwrap();
+            delay.delay_ms(100u16);
+        }
     }
 }

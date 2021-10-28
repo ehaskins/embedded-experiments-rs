@@ -3,8 +3,12 @@ MEMORY
 {
   /* NOTE 1 K = 1 KiBi = 1024 bytes */
   FLASH : ORIGIN = 0x08000000, LENGTH = 32K
+  USER_FLASH : ORIGIN = 0x8008000, LENGTH = 224K
   RAM : ORIGIN = 0x20000000, LENGTH = 40K
 }
+
+__suser = ORIGIN(USER_FLASH);
+__euser = ORIGIN(USER_FLASH) + LENGTH(USER_FLASH);
 
 /* This is where the call stack will be allocated. */
 /* The stack is of the full descending type. */
