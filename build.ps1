@@ -4,6 +4,7 @@ cargo build
 
 Set-Location ../app
 
-cargo build --features application
+cargo build
+cargo objcopy -- -O binary app.bin
 
 Pop-Location

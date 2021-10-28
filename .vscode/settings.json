@@ -1,7 +1,9 @@
 {
     "cSpell.words": [
+        "bootload",
         "BOOTLOADER",
         "Leds",
-        "Toggleable"
+        "Toggleable",
+        "vtor"
     ]
 }

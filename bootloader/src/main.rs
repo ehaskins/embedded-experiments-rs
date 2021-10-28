@@ -3,11 +3,12 @@
 
 extern crate panic_itm;
 
+use cortex_m::asm::bootload;
 use cortex_m_rt::entry;
 
 use stm32f3_discovery::stm32f3xx_hal::delay::Delay;
-use stm32f3_discovery::stm32f3xx_hal::prelude::*;
 use stm32f3_discovery::stm32f3xx_hal::pac;
+use stm32f3_discovery::stm32f3xx_hal::prelude::*;
 
 use stm32f3_discovery::leds::Leds;
 use stm32f3_discovery::switch_hal::{OutputSwitch, ToggleableOutputSwitch};
@@ -32,7 +33,9 @@ fn main() -> ! {
     let mut delay = Delay::new(core_peripherals.SYST, clocks);
 
     // initialize user leds
-    let mut gpioe = device_peripherals.GPIOE.split(&mut reset_and_clock_control.ahb);
+    let mut gpioe = device_peripherals
+        .GPIOE
+        .split(&mut reset_and_clock_control.ahb);
     let mut leds = Leds::new(
         gpioe.pe8,
         gpioe.pe9,
@@ -57,10 +60,14 @@ fn main() -> ! {
         &mut leds.ld4,
     ];
 
-    loop {
-        for led in &mut sequence {
-            led.toggle().unwrap();
-            delay.delay_ms(100u16);
-        }
+    for led in &mut sequence {
+        led.toggle().unwrap();
+        delay.delay_ms(100u16);
+    }
+
+    unsafe {
+        let user_vector_table = user_vector_table();
+        core_peripherals.SCB.vtor.write(*user_vector_table);
+        bootload(user_vector_table);
     }
 }
