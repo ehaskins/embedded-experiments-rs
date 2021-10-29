@@ -1,5 +1,5 @@
 [package]
-edition = "2018"
+edition = "2021"
 name = "bootloader"
 description = "Bootloader for the STM32F3DISCOVERY board"
 version = "1.0.0"

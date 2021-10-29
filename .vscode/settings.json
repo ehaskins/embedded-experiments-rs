@@ -1,9 +1,16 @@
 {
     "cSpell.words": [
+        "afrl",
         "bootload",
         "BOOTLOADER",
+        "cfgr",
+        "DBGMCU",
+        "GPIOE",
         "Leds",
+        "moder",
+        "otyper",
         "Toggleable",
+        "usart",
         "vtor"
     ]
 }

@@ -1,5 +1,5 @@
 [package]
-edition = "2018"
+edition = "2021"
 version = "1.0.0"
 name = "stm32f3-discovery"
 description = "Board support package for the STM32F3DISCOVERY board"

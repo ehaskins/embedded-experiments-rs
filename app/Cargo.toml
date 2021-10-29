@@ -1,6 +1,6 @@
 [package]
 authors = ["Eric Haskins<eric@ehaskins.com"]
-edition = "2018"
+edition = "2021"
 name = "app"
 version = "1.0.0"
 description = "Test apps for the STM32F3DISCOVERY board"
