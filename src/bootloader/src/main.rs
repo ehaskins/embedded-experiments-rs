@@ -26,6 +26,7 @@ fn main() -> ! {
         w.dbg_standby().set_bit();
         w.dbg_stop().set_bit()
     });
+    
     device_peripherals
         .RCC
         .ahbenr
@@ -86,15 +87,17 @@ fn main() -> ! {
     );
 
     let mut sending = tx.write_all(tx_buf, tx_channel);
-    loop {
-        spin_leds(&mut leds, &mut delay);
+    // loop {
+    //     spin_leds(&mut leds, &mut delay);
 
-        let (tx_buf, tx_channel, tx) = sending.wait();
+    //     let (tx_buf, tx_channel, tx) = sending.wait();
 
-        spin_leds(&mut leds, &mut delay);
+    //     spin_leds(&mut leds, &mut delay);
 
-        sending = tx.write_all(tx_buf, tx_channel);
-    }
+    //     sending = tx.write_all(tx_buf, tx_channel);
+    // }
+
+    spin_leds(&mut leds, &mut delay);
 
     boot_user(core_peripherals.SCB);
 }

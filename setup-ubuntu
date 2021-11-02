@@ -1,0 +1,30 @@
+#! /usr/bin/env bash
+
+set -eEu
+
+sudo apt install \
+    curl \
+    openocd \
+    gdb-multiarch \
+    minicom picocom \
+    build-essential
+
+if ! which node >> /dev/null || [[ `node -v` != "v16"* ]]; then 
+    curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+fi
+
+if ! which rustup; then 
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    source $HOME/.cargo/env
+else
+    rustup update
+fi
+
+rustup target add thumbv7em-none-eabihf
+
+sudo tee -a /etc/udev/rules.d/99-openocd.rules > /dev/null <<EOF
+# STM32F3DISCOVERY - ST-LINK/V2.1
+ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374b", MODE:="0666"
+EOF
+sudo udevadm control --reload-rules
