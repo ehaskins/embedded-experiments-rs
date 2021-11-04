@@ -3,6 +3,8 @@
 
 extern crate panic_itm;
 
+// pub mod modbus;
+
 use cortex_m::peripheral;
 use cortex_m::{asm, singleton};
 use cortex_m_rt::entry;
@@ -11,15 +13,22 @@ use stm32f3_discovery::leds::Leds;
 use stm32f3_discovery::stm32f3xx_hal::delay::Delay;
 use stm32f3_discovery::stm32f3xx_hal::pac;
 use stm32f3_discovery::stm32f3xx_hal::prelude::*;
-use stm32f3_discovery::stm32f3xx_hal::serial::Serial;
-use stm32f3_discovery::switch_hal::{OutputSwitch, ToggleableOutputSwitch};
+use stm32f3_discovery::stm32f3xx_hal::serial::{Serial, Event};
+use stm32f3_discovery::stm32f3xx_hal::interrupt;
+use stm32f3_discovery::stm32f3xx_hal::gpio::*;
+use stm32f3_discovery::switch_hal::{OutputSwitch, ToggleableOutputSwitch, Switch, ActiveHigh};
+
+type Serial1 = Serial<pac::USART1, (PC4<AF7<PushPull>>, PC5<AF7<PushPull>>)>;
+
+static mut serial1: Option<Serial1> = None;
+static mut serial_act_led: Option<Switch<Pin<Gpioe, Ux, Output<PushPull>>, ActiveHigh>> = None;
 
 #[entry]
 fn main() -> ! {
     let device_peripherals = pac::Peripherals::take().unwrap();
 
     // This is a workaround, so that the debugger will not disconnect
-    // imidiatly on asm::wfi();
+    // immediately on asm::wfi();
     // https://github.com/probe-rs/probe-rs/issues/350#issuecomment-740550519
     device_peripherals.DBGMCU.cr.modify(|_, w| {
         w.dbg_sleep().set_bit();
@@ -64,7 +73,7 @@ fn main() -> ! {
         clocks,
         &mut reset_and_clock_control.apb2,
     );
-    let (tx, _rx) = serial.split();
+    let (tx, rx) = serial.split();
 
     let dma1 = device_peripherals
         .DMA1
@@ -87,19 +96,31 @@ fn main() -> ! {
     );
 
     let mut sending = tx.write_all(tx_buf, tx_channel);
-    // loop {
-    //     spin_leds(&mut leds, &mut delay);
+    let (tx_buf, tx_channel, tx) = sending.wait();
 
-    //     let (tx_buf, tx_channel, tx) = sending.wait();
+    unsafe {
+        serial_act_led = Some(leds.ld3);
+        serial1 = Some(Serial::join(tx,rx));
+        serial1.as_mut().unwrap().enable_interrupt(Event::ReceiveDataRegisterNotEmpty);
+    }
 
-    //     spin_leds(&mut leds, &mut delay);
-
-    //     sending = tx.write_all(tx_buf, tx_channel);
-    // }
-
-    spin_leds(&mut leds, &mut delay);
+    loop {
+        // spin_leds(&mut leds, &mut delay);
+    }    
 
     boot_user(core_peripherals.SCB);
+}
+
+#[interrupt]
+fn USART1_EXTI25() {
+    unsafe {
+        serial_act_led.as_mut().unwrap().toggle().unwrap();
+        // let serial = serial1.as_mut().unwrap();
+        // if serial.is_event_triggered(Event::ReceiveDataRegisterNotEmpty) {
+        //     let rdr = serial.read().unwrap();
+        //     serial.write(rdr);
+        // }
+    }    
 }
 
 fn spin_leds(leds: &mut Leds, delay: &mut Delay) {
